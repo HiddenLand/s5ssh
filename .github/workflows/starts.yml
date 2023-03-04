@@ -5,11 +5,11 @@ on:
     inputs:
       instance:
         description: ec2 instance id
-        type: string
+        type: choice
         default: i-0d50d0703deee5ace
       operation:
         description: ops
-        type: string
+        type: choice
         default: start
         options:
           - 'start'
