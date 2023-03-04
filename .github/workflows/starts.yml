@@ -60,13 +60,13 @@ jobs:
         if: ${{ env.operation == 'start' }}
         run: |
           aws ec2 start-instances --instance-ids ${{ env.instance }}
-          echo "On" > SERVER_STATUS
+          echo "ON" > SERVER_STATUS
 
       - name: Stop instance
         if: ${{ env.operation == 'stop' }}
         run: |
           aws ec2 stop-instances --instance-ids ${{ env.instance }}
-          echo "Off" > SERVER_STATUS
+          echo "OFF" > SERVER_STATUS
 
       - name: Get EC2 instance information
         if: ${{ env.operation == 'start' }}
@@ -81,10 +81,15 @@ jobs:
           echo "To set up dynamic port forwarding:"
           echo ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name
           
+          echo "ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name" > SERVER_STATUS
+
+      - name: commit and push SERVER_STATUS
+        id: ec2-info
+        run: |
           git add SERVER_STATUS
           git config --global user.name "HiddenLand Automation"
           git config --global user.email "automation@hiddenland.xyz"
           git commit -a -m "Server Status"
           git push --set-upstream origin main
           
-          echo ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name > SERVER_STATUS
+          
