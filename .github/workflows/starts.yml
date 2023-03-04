@@ -89,6 +89,6 @@ jobs:
           git config --global user.name "HiddenLand Automation"
           git config --global user.email "automation@hiddenland.xyz"
           git commit -a -m "Server Status"
-          git push --set-upstream origin main
+          git push --force --set-upstream origin status
           
           
