@@ -1,0 +1,78 @@
+name: 🎾 Start/Stop EC2 Instance
+
+on:
+  workflow_dispatch:
+    inputs:
+      instance:
+        description: ec2 instance id
+        type: string
+        default: i-0d50d0703deee5ace
+      operation:
+        description: ops
+        type: string
+        default: start
+        options:
+          - 'start'
+          - 'stop'
+  schedule:
+    - cron: '0 16 * * *'
+
+
+jobs:
+  start-stop-ec2-instance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
+
+      - name: Set Default Values
+        id: vars
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              echo "instance=${{ github.event.inputs.instance }}" >> $GITHUB_ENV
+              echo "operation=${{ github.event.inputs.operation }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+              echo "instance=i-123456789" >> $GITHUB_ENV
+              echo "operation=stop" >> $GITHUB_ENV
+          else
+              echo "Unknown event type '${{ github.event_name }}'. Exiting..." >&2
+              exit 1
+          fi
+    
+          cat $GITHUB_ENV
+
+      - name: Triage
+        run: |
+          echo ${{ env.instance }}
+          echo ${{ env.operation }}
+          echo "${{ toJson(github.event) }}"
+
+      - name: Start EC2 Instance
+        if: ${{ env.operation == 'start' }}
+        run: |
+          aws ec2 start-instances --instance-ids ${{ env.instance }}
+
+      - name: Stop instance
+        if: ${{ env.operation == 'stop' }}
+        run: |
+          aws ec2 stop-instances --instance-ids ${{ env.instance }}
+
+      - name: Get EC2 instance information
+        if: ${{ env.operation == 'start' }}
+        id: ec2-info
+        run: |
+          instance_id="${{ env.instance }}"
+          dns_name="$(aws ec2 describe-instances --instance-ids $instance_id --query "Reservations[].Instances[].PublicDnsName" --output=text)"
+          ip_address="$(aws ec2 describe-instances --instance-ids $instance_id --query "Reservations[].Instances[].PublicIpAddress" --output=text)"
+          echo "dns_name=$dns_name" >> $GITHUB_ENV
+          echo "ip_address=$ip_address" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+          echo "To set up dynamic port forwarding:"
+          echo ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name
