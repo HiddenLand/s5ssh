@@ -6,7 +6,9 @@ on:
       instance:
         description: ec2 instance id
         type: choice
-        default: i-0d50d0703deee5ace
+        default: 'i-0d50d0703deee5ace'
+        options:
+          - 'i-0d50d0703deee5ace'
       operation:
         description: ops
         type: choice
