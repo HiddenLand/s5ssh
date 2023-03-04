@@ -26,7 +26,7 @@ All your traffic is encrypted.
     - choose `Manual proxy configuration`
       - `SOCKS Host`: `localhost`
       - `Port`: `1337`
-    - Select `Proxy DNS when using SOCKS v5`
+    - Tick the checkbox `Proxy DNS when using SOCKS v5`
   - try to access `www.google.com`. 
 
 
