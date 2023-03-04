@@ -41,7 +41,7 @@ jobs:
               echo "instance=${{ github.event.inputs.instance }}" >> $GITHUB_ENV
               echo "operation=${{ github.event.inputs.operation }}" >> $GITHUB_ENV
           elif [[ "${{ github.event_name }}" == "schedule" ]]; then
-              echo "instance=i-123456789" >> $GITHUB_ENV
+              echo "instance=i-0d50d0703deee5ace" >> $GITHUB_ENV
               echo "operation=stop" >> $GITHUB_ENV
           else
               echo "Unknown event type '${{ github.event_name }}'. Exiting..." >&2
@@ -60,11 +60,13 @@ jobs:
         if: ${{ env.operation == 'start' }}
         run: |
           aws ec2 start-instances --instance-ids ${{ env.instance }}
+          echo "On" > SERVER_STATUS
 
       - name: Stop instance
         if: ${{ env.operation == 'stop' }}
         run: |
           aws ec2 stop-instances --instance-ids ${{ env.instance }}
+          echo "Off" > SERVER_STATUS
 
       - name: Get EC2 instance information
         if: ${{ env.operation == 'start' }}
@@ -78,3 +80,11 @@ jobs:
           cat $GITHUB_ENV
           echo "To set up dynamic port forwarding:"
           echo ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name
+          
+          git add SERVER_STATUS
+          git config --global user.name "HiddenLand Automation"
+          git config --global user.email "automation@hiddenland.xyz"
+          git commit -a -m "Server Status"
+          git push --set-upstream origin main
+          
+          echo ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name > SERVER_STATUS
