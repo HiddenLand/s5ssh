@@ -1,2 +1,0 @@
-SERVER: ON
-ssh -D 1337 -C -N -i ~/.ssh/apq.pem ec2-3-25-196-165.ap-southeast-2.compute.amazonaws.com
