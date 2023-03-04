@@ -81,7 +81,7 @@ jobs:
           echo "To set up dynamic port forwarding:"
           echo ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name
           
-          echo "ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name" > SERVER_STATUS
+          echo "ssh -D 1337 -C -N -i ~/.ssh/apq.pem $dns_name" >> SERVER_STATUS
 
       - name: commit and push SERVER_STATUS
         run: |
