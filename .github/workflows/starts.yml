@@ -90,7 +90,8 @@ jobs:
           git add SERVER_STATUS
           git config --global user.name "HiddenLand Automation"
           git config --global user.email "automation@hiddenland.xyz"
+          git checkout -b gen/status
           git commit -a -m "Server Status"
-          git push --force origin status
+          git push --force --set-upstream origin gen/status
           
           
